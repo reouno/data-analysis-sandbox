@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eux
+
+# Run right under the project root directory
+
+bin/prod exec api bash -c "DJANGO_SETTINGS_MODULE=api_server.settings.prod $*"

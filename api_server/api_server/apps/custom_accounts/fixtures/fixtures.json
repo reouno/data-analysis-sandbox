@@ -1,0 +1,20 @@
+[
+  {
+    "model": "custom_accounts.customuser",
+    "pk": "8b88bf71-6e91-4ed5-adac-bed5f8614835",
+    "fields": {
+      "password": "pbkdf2_sha256$320000$a49XlHUSnuzy8gtQovbIuC$hOaylYy9coTEOhopazYSH4KMdjXS2hPm3BL9zmJX2B0=",
+      "last_login": "2022-03-06T03:12:26.486Z",
+      "is_superuser": true,
+      "username": "admin@example.com",
+      "first_name": "admin",
+      "last_name": "my last name",
+      "email": "admin@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2022-03-06T02:33:26.870Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

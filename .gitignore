@@ -1,3 +1,26 @@
+# IntelliJ IDEA
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+
+# python
+.python-version
+.venv
+
+# Django
+*.pyc
+__pycache__/
+db-volumes/
+db.sqlite3
+
+**/*.sqlite
+
+.env
+.env.*
+
+# SSL Certificates
+app.conf
+nginx/data/certbot/
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Node template
 # Logs
