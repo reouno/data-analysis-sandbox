@@ -30,7 +30,7 @@ services:
       context: ./front
       dockerfile: Dockerfile.dev
     container_name: das-dev-front
-    command: sh -c "HOST=${FRONT_HOST} PORT=${FRONT_PORT} NUXT_ENV_BACKEND_URL=${NUXT_ENV_BACKEND_URL} yarn dev"
+    command: sh -c "yarn install && HOST=${FRONT_HOST} PORT=${FRONT_PORT} NUXT_ENV_BACKEND_URL=${NUXT_ENV_BACKEND_URL} yarn dev"
     ports:
       - "${FRONT_PORT}:${FRONT_PORT}"
     depends_on:
