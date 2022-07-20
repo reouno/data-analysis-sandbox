@@ -4,7 +4,7 @@ services:
     image: postgres:14-alpine
     container_name: das-dev-db
     ports:
-      - "${SQL_PORT}:${SQL_PORT}"
+      - "${SQL_PORT}:5432"
     volumes:
       - das_dev_db:/var/lib/postgresql/data
     environment:
