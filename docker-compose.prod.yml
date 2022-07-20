@@ -1,0 +1,112 @@
+version: "3.8"
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "2M"
+    max-file: "20"
+    compress: "true"
+
+x-health: &default-healthcheck
+  interval: 1m
+  timeout: 30s
+  retries: 2
+
+
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: das-prd-db
+    expose:
+      - "${SQL_PORT}"
+    command: postgres -c logging_collector=off -c log_destination=stderr -c log_min_duration_statement=3000
+    healthcheck:
+      test: pg_isready -d ${SQL_DATABASE} -U ${SQL_USER} || exit 1
+      <<: *default-healthcheck
+    volumes:
+      - das_prd_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${SQL_USER}
+      - POSTGRES_PASSWORD=${SQL_PASSWORD}
+      - POSTGRES_DB=${SQL_DATABASE}
+      - TZ=${TIME_ZONE}
+    restart: always
+    logging:
+      <<: *default-logging
+  api:
+    build:
+      context: ./api_server
+      dockerfile: Dockerfile.prod
+    container_name: knowledge-tree-api-prd
+    command: gunicorn --bind 0.0.0.0:8000 --workers 1 --threads 4 --capture-output --log-level info --access-logfile '-' --error-logfile '-' api_server.wsgi:application
+    healthcheck:
+      test: curl --fail http://localhost:8000/api/health_check/health_check/ || exit 1
+      <<: *default-healthcheck
+    expose:
+      - 8000 # docker内部でのみ公開
+    depends_on:
+      - db
+    volumes:
+      - ./api_server:/usr/src/app/
+      - das_prd_staticfiles:/home/app/web/staticfiles
+    env_file:
+      - ./.env.prod
+    restart: always
+    logging:
+      <<: *default-logging
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      args:
+        - HOST=${FRONT_HOST}
+        - PORT=${FRONT_PORT}
+        - NUXT_ENV_BASE_URL=${NUXT_ENV_BASE_URL}
+    container_name: knowledge-tree-front-prd
+    expose:
+      - "${FRONT_PORT}"
+    depends_on:
+      - api
+    env_file: ./.env.prod
+    restart: always
+    logging:
+      <<: *default-logging
+  nginx:
+    image: nginx:alpine
+    container_name: knowledge-tree-nginx-prd
+    healthcheck:
+      test: curl --fail http://localhost/api/health_check/health_check/ || exit 1
+      <<: *default-healthcheck
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    volumes:
+      - ./nginx/data/nginx:/etc/nginx/conf.d/:ro
+      - ./nginx/data/certbot/conf:/etc/letsencrypt:ro
+      - ./nginx/data/certbot/www:/var/www/certbot/:ro
+      - das_prd_staticfiles:/home/app/web/staticfiles
+    restart: always
+    logging:
+      <<: *default-logging
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./nginx/data/certbot/conf:/etc/letsencrypt:rw
+      - ./nginx/data/certbot/www:/var/www/certbot/:rw
+  autoheal:
+    restart: always
+    image: willfarrell/autoheal
+    container_name: knowledge-tree-autoheal-prd
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      <<: *default-logging
+
+
+volumes:
+  das_prd_db:
+  das_prd_staticfiles:

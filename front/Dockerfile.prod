@@ -1,0 +1,16 @@
+FROM node:16.16.0-alpine as frontend
+
+WORKDIR /src
+
+ADD . ./
+RUN rm -rf .nuxt && rm -rf node_modules && yarn install
+
+ENV HOST=${HOST}
+ENV PORT=${PORT}
+ENV NUXT_ENV_BASE_URL=${NUXT_ENV_BASE_URL}
+ENV NUXT_ENV_BACKEND_URL=${NUXT_ENV_BACKEND_URL}
+
+RUN NUXT_ENV_BASE_URL=${NUXT_ENV_BASE_URL} NUXT_ENV_BACKEND_URL=${NUXT_ENV_BACKEND_URL} yarn build
+
+ENTRYPOINT ["yarn", "start"]
+EXPOSE ${PORT}

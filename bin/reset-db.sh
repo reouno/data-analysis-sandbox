@@ -5,7 +5,7 @@ set -eux
 cd "$(dirname $0)"
 
 # delete db
-rm -f ../api_server/api_server/db.sqlite3
+rm -f ../api_server/db.sqlite3
 
 # migration
 cd ../api_server && python manage.py migrate

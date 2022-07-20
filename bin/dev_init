@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eux
+
+# プロジェクト直下で実行すること
+
+bin/dev exec api python manage.py loaddata api_server/apps/custom_accounts/fixtures/fixtures.json

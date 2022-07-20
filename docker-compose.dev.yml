@@ -1,12 +1,12 @@
 version: "3.8"
 services:
   db:
-    image: postgres:14.4-alpine3.16
+    image: postgres:14-alpine
     container_name: das-dev-db
     ports:
       - "${SQL_PORT}:${SQL_PORT}"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - das_dev_db:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=${SQL_USER}
       - POSTGRES_PASSWORD=${SQL_PASSWORD}
@@ -40,4 +40,4 @@ services:
     env_file: ./.env.dev
 
 volumes:
-  postgres_data:
+  das_dev_db:
